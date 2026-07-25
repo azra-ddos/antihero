@@ -21,18 +21,18 @@
 
 const ANTIHERO_PROJECTS = [
   {
-    title: "Azra Bot",
-    url: "",
-    image: "karya/azra-bot.jpg"
+    title: "Azra-Chat",
+    url: "https://azra-chat.lovable.app",
+    image: "azrachat.png"
   },
   {
-    title: "Code Obfuscator",
-    url: "",
-    image: "karya/obfuscator.jpg"
+    title: "Beranda AZRA-X",
+    url: "https://azra-x.vercel.app",
+    image: "azrax.png"
   },
   {
-    title: "Proyek Baru",
-    url: "",
+    title: "Coming Soon",
+    url: "https://",
     image: ""
   }
 ];
