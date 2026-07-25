@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANTIHERO — Komunitas Developer & Kreator</title>
+<meta name="description" content="ANTIHERO — kolektif developer dan kreator independen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!--
+============================================================
+ANTIHERO — Website Komunitas
+============================================================
+CARA EDIT SITUS INI (semua manual, tanpa tombol edit di browser):
+
+1) FOTO FOUNDER & ANGGOTA
+   - Taruh file foto (.jpg/.png) di folder "foto/" di sebelah file ini.
+   - Nama file yang dicari: foto/founder.jpg, foto/unit-01.jpg,
+     foto/unit-02.jpg, foto/unit-03.jpg, foto/unit-04.jpg.
+   - Belum ada fotonya? Tidak masalah — otomatis tampil ikon default.
+
+2) LOGO KOMUNITAS
+   - Taruh file "logo.png" di folder yang SAMA dengan file ini (root).
+   - Dipakai otomatis di navbar dan di hero (logo besar).
+
+3) NAMA / PERAN / BIO ANGGOTA
+   - Cari bagian TIM di bawah. Tiap anggota ditandai komentar UNIT-00,
+     UNIT-01, dst. Edit teksnya (nama/peran/bio) langsung di situ.
+
+4) PROYEK / KARYA
+   - JANGAN diedit di sini. Buka file projects.js di folder yang sama,
+     tinggal tambah/hapus/ubah objek di dalam array-nya.
+
+5) KONTAK
+   - Cari bagian KONTAK, ganti link email/GitHub/Telegram di situ.
+============================================================
+-->
+
+<style>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:root {
+  --ink: #110f10;
+  --paper: #f4f1ec;
+  --dim: rgba(244,241,236,0.58);
+  --dimmer: rgba(244,241,236,0.38);
+  --signal: #e6394f;
+  --signal-dim: rgba(230,57,79,0.35);
+  --gold: #d4a441;
+  --border: rgba(244,241,236,0.14);
+  --border-hi: rgba(244,241,236,0.34);
+  --ease-smooth: cubic-bezier(0.16,1,0.3,1);
+  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  overflow-x:hidden;
+  min-height:100vh;
+  position:relative;
+  line-height:1.5;
+}
+img { max-width:100%; display:block; }
+button { font-family:inherit; border:none; cursor:pointer; background:none; color:inherit; }
+a { color:inherit; }
+h1,h2,h3,h4 { font-family:'Big Shoulders Display',sans-serif; font-weight:800; line-height:0.95; letter-spacing:-0.01em; }
+
+/* ===== SCROLL PROGRESS ===== */
+.scroll-progress {
+  position:fixed; top:0; left:0; height:3px; width:0%; z-index:200;
+  background:linear-gradient(90deg, var(--signal), var(--gold));
+}
+
+/* ===== ATMOSPHERE ===== */
+.grain {
+  position:fixed; inset:0; z-index:1; opacity:0.05; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.orb-layer { position:fixed; inset:0; z-index:0; pointer-events:none; will-change:transform; }
+.orb { position:absolute; border-radius:50%; filter:blur(90px); }
+.orb-a { width:480px; height:480px; background:var(--signal); opacity:0.16; top:-140px; left:-120px; animation:driftA 24s ease-in-out infinite; }
+.orb-b { width:420px; height:420px; background:var(--gold); opacity:0.14; bottom:-120px; right:-100px; animation:driftB 28s ease-in-out infinite; }
+@keyframes driftA { 0%,100%{transform:translate(0,0);} 50%{transform:translate(60px,70px);} }
+@keyframes driftB { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-60px,-50px);} }
+.sprite { position:absolute; width:0; height:0; overflow:hidden; }
+
+/* ===== GLASS ===== */
+.glass {
+  position:relative;
+  background-color:rgba(30,26,28,0.55);
+  background-image:linear-gradient(135deg, rgba(244,241,236,0.09), rgba(244,241,236,0.02));
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid var(--border);
+  border-top-color:var(--border-hi);
+  box-shadow:0 8px 32px rgba(0,0,0,0.35), inset 0 1px 1px rgba(244,241,236,0.12);
+  border-radius:24px;
+}
+
+/* ===== REVEAL / DECODE ===== */
+.reveal { opacity:0; transform:translateY(28px); transition:opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth); }
+.reveal.in-view { opacity:1; transform:translateY(0); }
+.members-grid .member-card:nth-child(1){transition-delay:0.05s;}
+.members-grid .member-card:nth-child(2){transition-delay:0.13s;}
+.members-grid .member-card:nth-child(3){transition-delay:0.21s;}
+.members-grid .member-card:nth-child(4){transition-delay:0.29s;}
+.directives-grid .directive-card:nth-child(1){transition-delay:0.05s;}
+.directives-grid .directive-card:nth-child(2){transition-delay:0.13s;}
+.directives-grid .directive-card:nth-child(3){transition-delay:0.21s;}
+.directives-grid .directive-card:nth-child(4){transition-delay:0.29s;}
+.process-row .process-step:nth-child(1){transition-delay:0.05s;}
+.process-row .process-step:nth-child(2){transition-delay:0.13s;}
+.process-row .process-step:nth-child(3){transition-delay:0.21s;}
+.process-row .process-step:nth-child(4){transition-delay:0.29s;}
+.eyebrow {
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.78rem;
+  letter-spacing:0.1em; color:var(--signal); margin-bottom:10px;
+}
+
+/* ===== SECTION DIVIDER ===== */
+.section-divider { display:flex; align-items:center; justify-content:center; gap:14px; max-width:1080px; margin:0 auto; padding:0 24px; }
+.section-divider::before, .section-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.section-divider span { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--dimmer); letter-spacing:0.2em; }
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position:sticky; top:14px; margin:14px auto 0; max-width:760px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 10px 10px 16px; border-radius:999px; z-index:100;
+}
+.nav-brand { display:flex; align-items:center; gap:10px; }
+.nav-title { font-family:'Big Shoulders Display',sans-serif; font-weight:800; letter-spacing:0.03em; font-size:1.05rem; }
+.nav-links { display:flex; gap:18px; padding-right:10px; }
+.nav-links a {
+  font-family:'IBM Plex Mono',monospace; text-transform:uppercase; font-size:0.7rem; letter-spacing:0.08em;
+  text-decoration:none; color:var(--dim); position:relative; transition:color 0.3s ease; padding-bottom:2px;
+}
+.nav-links a::after { content:''; position:absolute; left:0; bottom:0; width:0; height:1px; background:var(--signal); transition:width 0.3s var(--ease-smooth); }
+.nav-links a:hover { color:var(--paper); }
+.nav-links a:hover::after { width:100%; }
+
+/* ===== IMAGE FRAMES (shared) ===== */
+.avatar-frame, .logo-frame, .nav-logo-frame, .project-image-frame {
+  position:relative; overflow:hidden;
+  background-color:rgba(244,241,236,0.05);
+  background-image:linear-gradient(135deg, rgba(244,241,236,0.08), rgba(244,241,236,0.01));
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+}
+.member-photo, .logo-photo, .nav-logo-photo, .project-photo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:2;
+}
+.avatar-placeholder, .project-placeholder { color:var(--paper); fill:var(--paper); opacity:0.45; }
+.avatar-placeholder { width:44%; }
+.project-placeholder { width:36%; }
+.logo-placeholder, .nav-logo-placeholder {
+  font-family:'Big Shoulders Display',sans-serif; font-weight:800; color:var(--signal); opacity:0.85;
+}
+
+.nav-logo-frame { border-radius:11px; width:38px; height:38px; flex-shrink:0; }
+.nav-logo-placeholder { font-size:0.9rem; }
+
+/* ===== HERO ===== */
+.hero {
+  min-height:92vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:80px 24px 50px; position:relative; z-index:2;
+  animation:heroIn 0.9s var(--ease-smooth) both;
+}
+@keyframes heroIn { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+.logo-frame { border-radius:32px; width:172px; height:172px; margin:0 auto; }
+.logo-placeholder { font-size:3.6rem; }
+.hero-title { font-size:clamp(3.2rem, 14vw, 7rem); margin:30px 0 16px; }
+.signal { color:var(--signal); }
+.hero-tagline { font-size:clamp(1rem,3vw,1.2rem); color:var(--dim); max-width:460px; margin:0 auto 22px; }
+
+.terminal-line {
+  font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--paper);
+  display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; min-height:1.4em;
+}
+.terminal-prompt { color:var(--signal); font-weight:700; }
+.terminal-cursor { display:inline-block; color:var(--signal); animation:blink 1s step-end infinite; }
+@keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+.terminal-response {
+  display:block; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--dimmer);
+  margin:2px 0 26px; opacity:0; transition:opacity 0.6s ease; min-height:1.2em;
+}
+
+.hero-stats { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+.stat-chip {
+  display:flex; align-items:center; gap:8px; padding:9px 18px; border-radius:999px;
+  font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.05em;
+}
+.stat-num { font-weight:700; color:var(--signal); font-variant-numeric:tabular-nums; }
+.status-dot { width:7px; height:7px; border-radius:50%; background:#5fd97a; box-shadow:0 0 8px #5fd97a; animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.5; transform:scale(0.8);} }
+
+/* ===== BUTTONS (liquid glass, elastic) ===== */
+.btn-glass {
+  padding:14px 28px; border-radius:16px; font-weight:600; font-size:0.92rem; color:var(--paper);
+  background-color:rgba(244,241,236,0.05);
+  background-image:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(244,241,236,0.30), rgba(244,241,236,0.03) 60%);
+  backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%);
+  border:1px solid var(--border-hi);
+  box-shadow:0 4px 18px rgba(0,0,0,0.3), inset 0 1px 1px rgba(244,241,236,0.25);
+  display:inline-flex; align-items:center; gap:8px; justify-content:center; text-decoration:none;
+  transition:transform 0.6s var(--ease-spring), box-shadow 0.3s ease, background-color 0.3s ease;
+  will-change:transform;
+}
+.btn-glass:hover { background-color:rgba(244,241,236,0.09); box-shadow:0 6px 24px rgba(0,0,0,0.35), inset 0 1px 1px rgba(244,241,236,0.3); }
+.btn-glass.pressed { transition:transform 0.15s cubic-bezier(0.4,0,0.2,1); }
+
+/* ===== SECTIONS ===== */
+main { position:relative; z-index:2; }
+.section { max-width:1080px; margin:0 auto; padding:64px 24px; }
+.section h2 { font-size:clamp(1.9rem,5vw,2.8rem); margin-bottom:10px; }
+.section-subtitle { color:var(--dim); margin-bottom:40px; font-size:0.98rem; }
+.body-text { max-width:640px; font-size:1.05rem; color:var(--dim); }
+
+/* ===== PHILOSOPHY / DIRECTIVES ===== */
+.directives-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
+.directive-card { padding:26px; transition:transform 0.35s var(--ease-smooth), box-shadow 0.35s ease; }
+.directive-card:hover { transform:translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,0.4); }
+.directive-num { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--signal); letter-spacing:0.08em; margin-bottom:12px; display:block; }
+.directive-text { font-family:'Big Shoulders Display',sans-serif; font-weight:700; font-size:1.3rem; line-height:1.15; }
+
+/* ===== TEAM ===== */
+.unit-tag {
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.08em;
+  color:var(--dim); border:1px solid var(--border); border-radius:999px; padding:3px 10px; margin-bottom:10px;
+}
+.founder-card { padding:32px; margin-bottom:28px; transition:transform 0.4s var(--ease-smooth); }
+.founder-card::before, .founder-card::after {
+  content:''; position:absolute; width:20px; height:20px; border:2px solid var(--signal); opacity:0.55; pointer-events:none;
+}
+.founder-card::before { top:14px; left:14px; border-right:none; border-bottom:none; }
+.founder-card::after { bottom:14px; right:14px; border-left:none; border-top:none; }
+.founder-badge {
+  display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-weight:700;
+  font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; color:#241a0d; padding:6px 14px; border-radius:999px;
+  background:linear-gradient(135deg,#e8c168,#c9962f); margin-bottom:20px;
+}
+.founder-content { display:flex; align-items:center; gap:32px; flex-wrap:wrap; }
+.founder-avatar { width:150px; height:150px; border-radius:50%; flex-shrink:0; }
+.founder-info { flex:1; min-width:220px; }
+.founder-info h3 { font-size:clamp(1.5rem,4vw,2rem); margin-bottom:6px; }
+.role-tag { color:var(--signal); font-weight:600; font-size:0.92rem; margin-bottom:12px; }
+.founder-bio { color:var(--dim); max-width:480px; }
+
+.members-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:18px; }
+.member-card { padding:26px 20px; text-align:center; transition:transform 0.35s ease, box-shadow 0.35s ease; }
+.member-card:hover { transform:translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,0.4); }
+.member-card .avatar-frame { width:84px; height:84px; border-radius:50%; margin:0 auto 14px; }
+.member-card h4 { font-size:1.1rem; margin-bottom:4px; font-family:'IBM Plex Sans',sans-serif; font-weight:700; }
+.member-card .role-tag { font-size:0.82rem; margin-bottom:0; }
+
+/* ===== STACK ===== */
+.stack-row { display:flex; flex-wrap:wrap; gap:12px; }
+.stack-badge {
+  display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:14px;
+  font-family:'IBM Plex Mono',monospace; font-size:0.85rem;
+  transition:transform 0.35s var(--ease-spring), border-color 0.3s ease;
+}
+.stack-badge:hover { transform:translateY(-3px) scale(1.04); border-color:var(--signal); }
+
+/* ===== PROCESS ===== */
+.process-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:22px; }
+.process-step { padding:24px; text-align:center; position:relative; }
+.process-num {
+  width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-family:'Big Shoulders Display',sans-serif; font-weight:800; margin:0 auto 14px; font-size:1.1rem;
+  background:linear-gradient(135deg, rgba(230,57,79,0.28), rgba(212,164,65,0.16)); border:1px solid var(--border-hi);
+}
+.process-label { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; color:var(--dim); margin-bottom:6px; }
+.process-title { font-weight:700; font-size:1rem; }
+
+/* ===== PORTFOLIO (data-driven) ===== */
+.portfolio-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:22px; }
+.project-card { overflow:hidden; transition:transform 0.35s ease, box-shadow 0.35s ease; }
+.project-card:hover { transform:translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,0.4); }
+.project-image-frame { width:100%; aspect-ratio:16/10; border-radius:20px 20px 0 0; }
+.project-photo { transition:transform 0.6s var(--ease-smooth); }
+.project-card:hover .project-photo { transform:scale(1.07); }
+.project-info { padding:20px; }
+.project-info h4 { font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1.05rem; margin:2px 0 14px; }
+.project-visit-btn { padding:9px 18px; font-size:0.82rem; border-radius:12px; }
+.project-no-url { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; color:var(--dimmer); }
+.empty-state { color:var(--dim); font-family:'IBM Plex Mono',monospace; font-size:0.9rem; grid-column:1/-1; text-align:center; padding:40px 0; }
+
+/* ===== CONTACT ===== */
+.contact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.contact-link {
+  display:flex; align-items:center; justify-content:space-between; padding:20px 22px; text-decoration:none;
+  transition:transform 0.5s var(--ease-spring), border-color 0.3s ease;
+}
+.contact-link:hover { border-color:var(--signal); }
+.contact-link.pressed { transition:transform 0.15s cubic-bezier(0.4,0,0.2,1); }
+.contact-label { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--dim); letter-spacing:0.08em; display:block; margin-bottom:4px; }
+.contact-value { font-weight:600; word-break:break-word; }
+.contact-arrow { color:var(--signal); font-size:1.2rem; flex-shrink:0; margin-left:12px; }
+
+/* ===== FOOTER ===== */
+.footer { text-align:center; padding:50px 24px 70px; color:var(--dimmer); font-size:0.85rem; position:relative; z-index:2; }
+.footer p:first-child { margin-bottom:6px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:640px) {
+  .nav-title { display:none; }
+  .nav-links { gap:12px; }
+  .founder-content { flex-direction:column; text-align:center; }
+  .founder-avatar { margin:0 auto; }
+  .founder-bio { max-width:none; }
+  .logo-frame { width:132px; height:132px; }
+  .logo-placeholder { font-size:2.7rem; }
+}
+</style>
+</head>
+<body>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="grain"></div>
+<div class="orb-layer" id="orbLayerA"><div class="orb orb-a"></div></div>
+<div class="orb-layer" id="orbLayerB"><div class="orb orb-b"></div></div>
+
+<svg class="sprite" aria-hidden="true">
+  <symbol id="icon-user" viewBox="0 0 100 100">
+    <circle cx="50" cy="36" r="18"></circle>
+    <path d="M50 58c-24 0-40 15-40 34v8h80v-8c0-19-16-34-40-34z"></path>
+  </symbol>
+  <symbol id="icon-browser" viewBox="0 0 100 100">
+    <rect x="8" y="18" width="84" height="64" rx="8" fill="none" stroke="currentColor" stroke-width="4"></rect>
+    <line x1="8" y1="34" x2="92" y2="34" stroke="currentColor" stroke-width="4"></line>
+    <circle cx="19" cy="26" r="2.5"></circle>
+    <circle cx="28" cy="26" r="2.5"></circle>
+    <circle cx="37" cy="26" r="2.5"></circle>
+    <path d="M20 68l16-20 13 15 11-13 14 18" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+    <circle cx="63" cy="46" r="5" fill="currentColor"></circle>
+  </symbol>
+</svg>
+
+<nav class="navbar glass">
+  <div class="nav-brand">
+    <div class="nav-logo-frame">
+      <span class="nav-logo-placeholder">AH</span>
+      <!-- LOGO: taruh logo.png di folder yang sama dengan file ini -->
+      <img src="logo.png" alt="Logo ANTIHERO" class="nav-logo-photo" onerror="this.style.display='none'">
+    </div>
+    <span class="nav-title">ANTIHERO</span>
+  </div>
+  <div class="nav-links">
+    <a href="#tentang">Tentang</a>
+    <a href="#tim">Tim</a>
+    <a href="#karya">Karya</a>
+    <a href="#kontak">Kontak</a>
+  </div>
+</nav>
+
+<header class="hero" id="beranda">
+  <div class="logo-frame">
+    <span class="logo-placeholder">AH</span>
+    <img src="logo.png" alt="Logo ANTIHERO" class="logo-photo" onerror="this.style.display='none'">
+  </div>
+
+  <h1 class="hero-title"><span class="decode-el" id="hp1">ANTI</span><span class="decode-el signal" id="hp2">HERO</span></h1>
+
+  <p class="hero-tagline">Bukan pahlawan. Cuma developer yang terus membangun.</p>
+
+  <div class="terminal-line">
+    <span class="terminal-prompt">$</span>
+    <span id="terminalCmd"></span><span class="terminal-cursor">▌</span>
+  </div>
+  <div class="terminal-response" id="terminalResponse"></div>
+
+  <div class="hero-stats">
+    <div class="stat-chip glass"><span class="stat-num" id="statNum">00</span><span>UNIT TERDAFTAR</span></div>
+    <div class="stat-chip glass"><span class="status-dot"></span><span>AKTIF BERKARYA</span></div>
+  </div>
+
+  <button class="btn-glass liquid-btn" id="ctaBtn">Kenali Tim Kami ↓</button>
+</header>
+
+<main>
+  <section class="section" id="tentang">
+    <span class="eyebrow">// TENTANG</span>
+    <h2>Siapa Kami</h2>
+    <p class="body-text reveal">ANTIHERO adalah kolektif kecil berisi lima developer dan kreator independen. Kami membangun tools, bot, dan situs dari nol — biasanya sendirian, larut malam, dengan satu file dan terminal terbuka.</p>
+  </section>
+
+  <div class="section-divider"><span>· · ·</span></div>
+
+  <section class="section" id="prinsip">
+    <span class="eyebrow">// PRINSIP</span>
+    <h2>Cara Kami Bekerja</h2>
+    <div class="directives-grid">
+      <div class="directive-card glass reveal">
+        <span class="directive-num">DIRECTIVE-01</span>
+        <p class="directive-text">Selesai lebih baik dari sempurna.</p>
+      </div>
+      <div class="directive-card glass reveal">
+        <span class="directive-num">DIRECTIVE-02</span>
+        <p class="directive-text">Satu file, nol drama.</p>
+      </div>
+      <div class="directive-card glass reveal">
+        <span class="directive-num">DIRECTIVE-03</span>
+        <p class="directive-text">Kalau bisa diotomatisasi, otomatisasi.</p>
+      </div>
+      <div class="directive-card glass reveal">
+        <span class="directive-num">DIRECTIVE-04</span>
+        <p class="directive-text">Rapi saat rilis, bukan saat draft.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"><span>· · ·</span></div>
+
+  <section class="section" id="tim">
+    <span class="eyebrow">// TIM</span>
+    <h2>05 Unit Terdaftar</h2>
+    <p class="section-subtitle">Info tim disetel langsung lewat kode. Lihat komentar di HTML untuk cara ganti foto/nama/peran.</p>
+
+    <!-- UNIT-00 (FOUNDER) — foto: foto/founder.jpg — edit nama/peran/bio di teks bawah -->
+    <div class="founder-card glass reveal" id="founderCard">
+      <div class="founder-badge">★ Founder &amp; CEO</div>
+      <div class="founder-content">
+        <div class="avatar-frame founder-avatar">
+          <svg class="avatar-placeholder"><use href="#icon-user"></use></svg>
+          <img src="foto/founder.jpg" alt="Foto MHD. Naufal Azra Duha" class="member-photo" onerror="this.style.display='none'">
+        </div>
+        <div class="founder-info">
+          <span class="unit-tag">UNIT-00</span>
+          <h3>MHD. Naufal Azra Duha</h3>
+          <p class="role-tag">Founder & CEO</p>
+          <p class="founder-bio">Pendiri dan pemimpin di balik ANTIHERO.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="members-grid">
+      <!-- UNIT-01 — foto: foto/unit-01.jpg -->
+      <div class="member-card glass reveal">
+        <div class="avatar-frame">
+          <svg class="avatar-placeholder"><use href="#icon-user"></use></svg>
+          <img src="foto/unit-01.jpg" alt="Foto anggota UNIT-01" class="member-photo" onerror="this.style.display='none'">
+        </div>
+        <span class="unit-tag">UNIT-01</span>
+        <h4>Anggota 2</h4>
+        <p class="role-tag">Lead Developer</p>
+      </div>
+      <!-- UNIT-02 — foto: foto/unit-02.jpg -->
+      <div class="member-card glass reveal">
+        <div class="avatar-frame">
+          <svg class="avatar-placeholder"><use href="#icon-user"></use></svg>
+          <img src="foto/unit-02.jpg" alt="Foto anggota UNIT-02" class="member-photo" onerror="this.style.display='none'">
+        </div>
+        <span class="unit-tag">UNIT-02</span>
+        <h4>Anggota 3</h4>
+        <p class="role-tag">UI/UX Designer</p>
+      </div>
+      <!-- UNIT-03 — foto: foto/unit-03.jpg -->
+      <div class="member-card glass reveal">
+        <div class="avatar-frame">
+          <svg class="avatar-placeholder"><use href="#icon-user"></use></svg>
+          <img src="foto/unit-03.jpg" alt="Foto anggota UNIT-03" class="member-photo" onerror="this.style.display='none'">
+        </div>
+        <span class="unit-tag">UNIT-03</span>
+        <h4>Anggota 4</h4>
+        <p class="role-tag">Content Creator</p>
+      </div>
+      <!-- UNIT-04 — foto: foto/unit-04.jpg -->
+      <div class="member-card glass reveal">
+        <div class="avatar-frame">
+          <svg class="avatar-placeholder"><use href="#icon-user"></use></svg>
+          <img src="foto/unit-04.jpg" alt="Foto anggota UNIT-04" class="member-photo" onerror="this.style.display='none'">
+        </div>
+        <span class="unit-tag">UNIT-04</span>
+        <h4>Anggota 5</h4>
+        <p class="role-tag">Community Manager</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"><span>· · ·</span></div>
+
+  <section class="section" id="stack">
+    <span class="eyebrow">// PERALATAN</span>
+    <h2>Senjata Kami</h2>
+    <p class="section-subtitle">Bahasa dan tools yang paling sering kami pakai.</p>
+    <div class="stack-row">
+      <span class="stack-badge glass">Python</span>
+      <span class="stack-badge glass">JavaScript</span>
+      <span class="stack-badge glass">HTML / CSS</span>
+      <span class="stack-badge glass">Termux</span>
+      <span class="stack-badge glass">Telegram Bot API</span>
+      <span class="stack-badge glass">Vercel</span>
+    </div>
+  </section>
+
+  <div class="section-divider"><span>· · ·</span></div>
+
+  <section class="section" id="alur">
+    <span class="eyebrow">// ALUR KERJA</span>
+    <h2>Dari Ide ke Rilis</h2>
+    <div class="process-row">
+      <div class="process-step glass reveal">
+        <div class="process-num">01</div>
+        <span class="process-label">MULAI</span>
+        <p class="process-title">Ide &amp; Riset</p>
+      </div>
+      <div class="process-step glass reveal">
+        <div class="process-num">02</div>
+        <span class="process-label">BUILD</span>
+        <p class="process-title">Bangun di Satu File</p>
+      </div>
+      <div class="process-step glass reveal">
+        <div class="process-num">03</div>
+        <span class="process-label">SHIP</span>
+        <p class="process-title">Deploy &amp; Uji Langsung</p>
+      </div>
+      <div class="process-step glass reveal">
+        <div class="process-num">04</div>
+        <span class="process-label">ITERASI</span>
+        <p class="process-title">Perbaiki dari Feedback</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"><span>· · ·</span></div>
+
+  <section class="section" id="karya">
+    <span class="eyebrow">// KARYA</span>
+    <h2>Yang Telah Kami Bangun</h2>
+    <p class="section-subtitle">Diambil otomatis dari <strong>projects.js</strong> — tambah proyek baru dengan edit file itu, bukan halaman ini.</p>
+    <div class="portfolio-grid" id="portfolioGrid"></div>
+  </section>
+
+  <div class="section-divider"><span>· · ·</span></div>
+
+  <section class="section" id="kontak">
+    <span class="eyebrow">// KONTAK</span>
+    <h2>Hubungi Kami</h2>
+    <p class="section-subtitle">Ganti link di bawah dengan kontak asli komunitas (edit langsung di HTML).</p>
+    <div class="contact-grid">
+      <a href="mailto:hello@antihero.dev" class="contact-link glass liquid-btn reveal">
+        <span><span class="contact-label">EMAIL</span><span class="contact-value">hello@antihero.dev</span></span>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a href="https://github.com/azradev" target="_blank" rel="noopener" class="contact-link glass liquid-btn reveal">
+        <span><span class="contact-label">GITHUB</span><span class="contact-value">github.com/azradev</span></span>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a href="https://t.me/antihero" target="_blank" rel="noopener" class="contact-link glass liquid-btn reveal">
+        <span><span class="contact-label">TELEGRAM</span><span class="contact-value">t.me/antihero</span></span>
+        <span class="contact-arrow">↗</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>© 2026 ANTIHERO</p>
+  <p>Dibuat dengan 🖤 oleh AzraDev</p>
+</footer>
+
+<script src="index.js"></script>
+<script>
+// ---------- utilities ----------
+var isFinePointer = window.matchMedia('(pointer:fine)').matches;
+
+function decodeText(el, duration) {
+  duration = duration || 900;
+  var finalText = el.textContent;
+  var chars = '#%&*<>/\\{}[]01_';
+  var len = finalText.length;
+  var stepTime = 35;
+  var totalSteps = Math.max(1, Math.round(duration / stepTime));
+  var step = 0;
+  var timer = setInterval(function () {
+    var out = '';
+    var revealCount = Math.floor((step / totalSteps) * len);
+    for (var i = 0; i < len; i++) {
+      if (finalText[i] === ' ') { out += ' '; continue; }
+      out += i < revealCount ? finalText[i] : chars[Math.floor(Math.random() * chars.length)];
+    }
+    el.textContent = out;
+    step++;
+    if (step > totalSteps) { el.textContent = finalText; clearInterval(timer); }
+  }, stepTime);
+}
+
+function typeTerminal(el, text, speed, callback) {
+  speed = speed || 45;
+  var i = 0;
+  var timer = setInterval(function () {
+    el.textContent = text.slice(0, i);
+    i++;
+    if (i > text.length) { clearInterval(timer); if (callback) callback(); }
+  }, speed);
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str === null || str === undefined ? '' : String(str);
+  return div.innerHTML;
+}
+
+function animateCounter(el, target, duration) {
+  duration = duration || 1200;
+  var startTime = null;
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = pad(Math.round(eased * target));
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = pad(target);
+  }
+  requestAnimationFrame(step);
+}
+
+// ---------- magnetic / elastic buttons ----------
+function bindMagnetic(btn) {
+  var translateStr = '';
+  if (isFinePointer) {
+    btn.addEventListener('pointermove', function (e) {
+      var rect = btn.getBoundingClientRect();
+      var x = e.clientX - rect.left - rect.width / 2;
+      var y = e.clientY - rect.top - rect.height / 2;
+      translateStr = 'translate(' + (x * 0.18) + 'px, ' + (y * 0.26) + 'px)';
+      btn.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+      btn.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+      if (!btn.classList.contains('pressed')) btn.style.transform = translateStr;
+    });
+  }
+  btn.addEventListener('pointerdown', function () {
+    btn.classList.add('pressed');
+    btn.style.transform = translateStr + ' scale(0.94)';
+  });
+  function release() { btn.classList.remove('pressed'); btn.style.transform = translateStr; }
+  btn.addEventListener('pointerup', release);
+  btn.addEventListener('pointercancel', release);
+  btn.addEventListener('pointerleave', function () { translateStr = ''; release(); });
+}
+
+// ---------- tilt (founder card — signature flourish) ----------
+function bindTilt(card) {
+  if (!isFinePointer || !card) return;
+  card.addEventListener('pointermove', function (e) {
+    var rect = card.getBoundingClientRect();
+    var px = (e.clientX - rect.left) / rect.width;
+    var py = (e.clientY - rect.top) / rect.height;
+    var rx = (py - 0.5) * -5;
+    var ry = (px - 0.5) * 5;
+    card.style.transform = 'perspective(1000px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+  });
+  card.addEventListener('pointerleave', function () { card.style.transform = ''; });
+}
+
+// ---------- observers ----------
+var revealObserver = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry) {
+    if (entry.isIntersecting) { entry.target.classList.add('in-view'); revealObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.15 });
+
+var eyebrowObserver = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry) {
+    if (entry.isIntersecting) { decodeText(entry.target, 550); eyebrowObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.6 });
+
+var counterObserver = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry) {
+    if (entry.isIntersecting) { animateCounter(entry.target, 5, 1000); counterObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.6 });
+
+// ---------- portfolio (data-driven from projects.js) ----------
+var portfolioGrid = document.getElementById('portfolioGrid');
+
+function renderProjects() {
+  var data = (typeof ANTIHERO_PROJECTS !== 'undefined' && Array.isArray(ANTIHERO_PROJECTS)) ? ANTIHERO_PROJECTS : [];
+  if (!data.length) {
+    portfolioGrid.innerHTML = '<p class="empty-state">Belum ada proyek terdaftar. Tambahkan di projects.js.</p>';
+    return;
+  }
+  data.forEach(function (project, index) {
+    var card = document.createElement('div');
+    card.className = 'project-card glass reveal';
+    var num = index + 1;
+    var fileTag = 'FILE-' + (num < 10 ? '0' + num : num);
+    var imageHtml = project.image
+      ? '<img src="' + escapeHtml(project.image) + '" alt="Screenshot ' + escapeHtml(project.title || '') + '" class="project-photo" onerror="this.style.display=\'none\'">'
+      : '';
+    var actionHtml = project.url
+      ? '<a href="' + escapeHtml(project.url) + '" target="_blank" rel="noopener" class="btn-glass liquid-btn project-visit-btn">Kunjungi ↗</a>'
+      : '<span class="project-no-url">Belum ada URL</span>';
+    card.innerHTML =
+      '<div class="project-image-frame">' +
+        '<svg class="project-placeholder"><use href="#icon-browser"></use></svg>' +
+        imageHtml +
+      '</div>' +
+      '<div class="project-info">' +
+        '<span class="unit-tag">' + fileTag + '</span>' +
+        '<h4>' + escapeHtml(project.title || 'Tanpa Judul') + '</h4>' +
+        actionHtml +
+      '</div>';
+    portfolioGrid.appendChild(card);
+    revealObserver.observe(card);
+    var visitBtn = card.querySelector('.liquid-btn');
+    if (visitBtn) bindMagnetic(visitBtn);
+  });
+}
+
+// ---------- scroll effects (progress bar + parallax), throttled ----------
+var scrollTicking = false;
+function updateScrollEffects() {
+  var y = window.scrollY;
+  var max = document.documentElement.scrollHeight - window.innerHeight;
+  var progress = max > 0 ? (y / max) * 100 : 0;
+  document.getElementById('scrollProgress').style.width = Math.min(progress, 100) + '%';
+  document.getElementById('orbLayerA').style.transform = 'translateY(' + (y * 0.1) + 'px)';
+  document.getElementById('orbLayerB').style.transform = 'translateY(' + (y * -0.08) + 'px)';
+  scrollTicking = false;
+}
+window.addEventListener('scroll', function () {
+  if (!scrollTicking) { requestAnimationFrame(updateScrollEffects); scrollTicking = true; }
+}, { passive: true });
+
+// ---------- cta smooth scroll ----------
+document.getElementById('ctaBtn').addEventListener('click', function () {
+  document.getElementById('tim').scrollIntoView({ behavior: 'smooth' });
+});
+
+// ---------- init ----------
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.liquid-btn').forEach(bindMagnetic);
+  bindTilt(document.getElementById('founderCard'));
+  document.querySelectorAll('.reveal').forEach(function (el) { revealObserver.observe(el); });
+  document.querySelectorAll('.eyebrow').forEach(function (el) { eyebrowObserver.observe(el); });
+  counterObserver.observe(document.getElementById('statNum'));
+
+  renderProjects();
+  updateScrollEffects();
+
+  setTimeout(function () {
+    decodeText(document.getElementById('hp1'), 900);
+    decodeText(document.getElementById('hp2'), 900);
+  }, 200);
+
+  setTimeout(function () {
+    typeTerminal(document.getElementById('terminalCmd'), 'whoami', 70, function () {
+      setTimeout(function () {
+        var resp = document.getElementById('terminalResponse');
+        resp.textContent = 'antihero_collective — 5 unit, status: aktif';
+        resp.style.opacity = '1';
+      }, 200);
+    });
+  }, 1300);
+});
+</script>
+</body>
+</html>
